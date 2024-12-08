@@ -287,4 +287,24 @@ class User extends Home
             return $this->response->setJSON($this->makeOutput(array(), FAIL_ERR_CODE, $e->getMessage()));
         }
     }
+
+    /**
+     * This function is used to get particular user details.
+     *
+     * @return Response Details of user is returned in the response.
+     */
+    public function detail_user($user_id)
+    {
+        try {
+            $check_if_user_is_deleted = $this->common_model->checkRecordExists(array('id' => $user_id, 'is_deleted' => DELETED), MAIN_USER);
+            if ($check_if_user_is_deleted) {
+                return $this->response->setJSON($this->makeOutput(array(), FAIL_ERR_CODE, USER_DELETED));
+            }
+            $user_details = $this->common_model->getRowData(MAIN_USER, array('id' => $user_id), 'id,first_name,last_name,email,phone_number,dob,added_on,updated_on,status');
+            return $this->response->setJSON($this->makeOutput($user_details, SUCCESS, DATA_FETCHED_SUCCESSFULLY));
+        } catch (\Exception $e) {
+            $this->response->setStatusCode(BAD_REQUEST);
+            return $this->response->setJSON($this->makeOutput(array(), FAIL_ERR_CODE, $e->getMessage()));
+        }
+    }
 }

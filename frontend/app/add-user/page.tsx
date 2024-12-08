@@ -66,7 +66,8 @@ export default function Home() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-8 flex flex-col space-y-4">
+      <h1 className="text-xl">Add User Form</h1>
       <DynamicForm schema={formSchema} onSubmit={handleSubmit} is_enabled={isSubmitEnabled} />
     </div>
   );

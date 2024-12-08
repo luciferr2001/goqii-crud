@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, Controller, FieldValues } from "react-hook-form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -19,11 +19,18 @@ type Schema = {
 type DynamicFormProps = {
   schema: Schema;
   onSubmit: (data: FieldValues) => void;
-  is_enabled:boolean
+  is_enabled: boolean;
+  values?: any;
 };
 
-const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit,is_enabled }) => {
+const DynamicForm: React.FC<DynamicFormProps> = ({
+  schema,
+  onSubmit,
+  is_enabled,
+  values,
+}) => {
   const {
+    setValue,
     control,
     handleSubmit,
     formState: { errors },
@@ -34,6 +41,14 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit,is_enabled }
       return acc;
     }, {} as Record<string, string>),
   });
+  useEffect(() => {
+    // Set form values only once after the component mounts
+    if (values) {
+      Object.entries(values).forEach(([key, value]) => {
+        setValue(key, value);
+      });
+    }
+  }, [values, setValue]);
 
   const renderField = (name: string, field: Field) => {
     const validationRules: Record<string, any> = {};
@@ -132,7 +147,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit,is_enabled }
         )}
       </div>
       <div>
-        <Button disabled={!is_enabled} type="submit">Submit</Button>
+        <Button disabled={!is_enabled} type="submit">
+          Submit
+        </Button>
       </div>
     </form>
   );
