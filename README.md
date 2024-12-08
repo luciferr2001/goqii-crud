@@ -72,6 +72,4 @@ This project consists of a frontend built with Next.js and a backend built with 
 
 ---
 
-## Project Status
-
-The project is now set up and ready to use!
+Note i have added a fake auth token only for demo purposes
