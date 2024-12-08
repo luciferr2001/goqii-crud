@@ -55,8 +55,5 @@ class Auth implements FilterInterface
      *
      * @return mixed
      */
-    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
-    {
-        //
-    }
+    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null) {}
 }

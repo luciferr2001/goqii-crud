@@ -28,7 +28,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit }) => {
     formState: { errors },
   } = useForm<FieldValues>({
     defaultValues: Object.keys(schema).reduce((acc, key) => {
-      acc[key] = ""; // Initialize fields with empty strings to ensure controlled input
+      acc[key] = "";
       return acc;
     }, {} as Record<string, string>),
   });
@@ -76,21 +76,16 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit }) => {
               control={control}
               rules={validationRules}
               render={({ field: controllerField }) => (
-                <div>
-                  <Input {...controllerField} type="input" />
-                </div>
-                // <input
-                //   {...controllerField}
-                //   value={controllerField.value || ""} // Ensure controlled input
-                // />
+                <Input {...controllerField} type="input" />
               )}
             />
             {errors[name] && (
-              <p style={{ color: "red" }}>{errors[name].message?.toString()}</p>
+              <p className="error-message" style={{ color: "red" }}>
+                {errors[name].message?.toString()}
+              </p>
             )}
           </div>
         );
-
       case "date":
         return (
           <div className="flex flex-col" key={name}>
@@ -109,7 +104,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit }) => {
               )}
             />
             {errors[name] && (
-              <p style={{ color: "red" }}>{errors[name].message?.toString()}</p>
+              <p className="error-message" style={{ color: "red" }}>
+                {errors[name].message?.toString()}
+              </p>
             )}
           </div>
         );
@@ -117,7 +114,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit }) => {
       default:
         return (
           <div key={name}>
-            <p style={{ color: "red" }}>Unsupported field type: {field.type}</p>
+            <p className="error-message" style={{ color: "red" }}>
+              Unsupported field type: {field.type}
+            </p>
           </div>
         );
     }

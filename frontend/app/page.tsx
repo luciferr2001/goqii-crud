@@ -1,59 +1,53 @@
-"use client"
+"use client";
 
-import DynamicForm from "@/components/form";
-import { FieldValues } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import UserTable from "@/components/user-table";
+import { StandardResponse } from "@/interface/standard-response";
+import { getRequest } from "@/lib/utils";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+interface User {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
+  dob: string;
+  added_on: string;
+  updated_on: string;
+  status: string; // Or `number` based on your use case
+}
+
+const USERS_URL = "http://localhost:8080/v1/user";
 
 export default function Home() {
-  const handleSubmit = (data: FieldValues) => {
-    console.log(data);
-  };
+  const [userData, setUserData] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const formSchema = {
-    first_name: {
-      label: "First Name",
-      rules: [
-        "required",
-        "max_length[50]",
-        "regex_match[^[^\\s][\\w',.\\-\\s][^0-9_!¡?÷?¿\\/\\+=@#$%&*(){}|~<>;:[\\]]{0,}[^\\s]$]",
-      ],
-      type: "input",
-    },
-    last_name: {
-      label: "Last Name",
-      rules: [
-        "required",
-        "max_length[50]",
-        "regex_match[^[^\\s][\\w',.\\-\\s][^0-9_!¡?÷?¿\\/\\+=@#$%&*(){}|~<>;:[\\]]{0,}[^\\s]$]",
-      ],
-      type: "input",
-    },
-    email: {
-      label: "Email",
-      rules: [
-        "required",
-        "regex_match[^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$]",
-      ],
-      type: "input",
-    },
-    phone_number: {
-      label: "Phone Number",
-      rules: [
-        "required",
-        "max_length[10]",
-        "min_length[10]",
-        "regex_match[^[0-9]+$]",
-      ],
-      type: "input",
-    },
-    dob: {
-      label: "Date Of Birth",
-      rules: ["required"],
-      type: "date",
-    },
-  };
+  async function users() {
+    try {
+      const data: StandardResponse = await getRequest(USERS_URL);
+      setUserData(data.data);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    users();
+  }, []);
+
   return (
-    <div className="items-center justify-items-center p-8">
-      <DynamicForm schema={formSchema} onSubmit={handleSubmit} />
-    </div>
+    <section className="container mx-auto p-6 font-mono flex flex-col space-y-4">
+      <div className="flex justify-end">
+        <Link href={"add-user"}>
+          <Button>Add User</Button>
+        </Link>
+      </div>
+
+      <UserTable />
+    </section>
   );
 }
