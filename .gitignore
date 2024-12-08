@@ -1,0 +1,46 @@
+# Node modules (React - frontend)
+frontend/node_modules/
+frontend/npm-debug.log
+frontend/yarn-error.log
+
+# Build output (React - frontend)
+frontend/build/
+frontend/dist/
+
+# Dependency directories (React - frontend)
+frontend.pnp/
+frontend.pnp.js
+
+# CodeIgniter 4 (Backend)
+backend/public/assets/
+backend/application/cache/
+backend/application/logs/
+backend/system/
+backend/vendor/
+
+# IDE or Editor-specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# dotenv files (if you are using environment variables)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Composer (for PHP dependencies - Backend)
+backend/composer.lock
+
+# PHPStorm/IDE configuration files
+/.idea/
+
+# PHPStorm global settings
+/.idea/*
