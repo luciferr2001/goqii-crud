@@ -39,10 +39,6 @@ class UserTable extends Migration
                 'type' => 'VARCHAR',
                 'constraint' => 155,
             ],
-            'full_name' => [
-                'type' => 'VARCHAR',
-                'constraint' => 155,
-            ],
             'dob' => [
                 'type' => 'date'
             ],
