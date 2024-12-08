@@ -73,7 +73,7 @@ class User extends Home
     }
 
     /**
-     * This function is used add user.
+     * This function is used to add user.
      *
      * @return Response Success or Failure is returned in the response.
      */
@@ -148,7 +148,7 @@ class User extends Home
     }
 
     /**
-     * This function is used add user.
+     * This function is used to edit user.
      *
      * @return Response Success or Failure is returned in the response.
      */
@@ -201,6 +201,42 @@ class User extends Home
             $db->transCommit();
             $db->transComplete();
             return $this->response->setJSON($this->makeOutput([], SUCCESS, USER_UPDATED_SUCCESSFULLY));
+        } catch (\Exception $e) {
+            // Log the exception if an error occurs
+            $this->response->setStatusCode(BAD_REQUEST);
+            return $this->response->setJSON($this->makeOutput(array(), FAIL_ERR_CODE, $e->getMessage()));
+        }
+    }
+
+    /**
+     * This function is used delete user.
+     *
+     * @return Response Success or Failure is returned in the response.
+     */
+    public function delete_user($user_id): Response
+    {
+        /* 
+            Here i am getting the user id directly from the url without encoding but i have implemented a encoding strategy in the other project to ensure that the id is not exposed to the public.
+            */
+        try {
+            /* Creating a soft delete functionalty to ensure that no data is deleted */
+            $check_if_user_is_deleted = $this->common_model->checkRecordExists(array('id' => $user_id, 'is_deleted' => DELETED), MAIN_USER);
+            if ($check_if_user_is_deleted) {
+                return $this->response->setJSON($this->makeOutput(array(), FAIL_ERR_CODE, USER_ALREADY_DELETED));
+            }
+            // Start a database transaction
+            $db = db_connect();
+            $db->transBegin();
+            $data = [
+                'status' => IN_ACTIVE,
+                'is_deleted' => DELETED,
+                'deleted_on' => $this->current_date_time
+            ];
+            $this->crud->delete(MAIN_USER, $user_id, $data);
+            // Commit the transaction if everything is successful
+            $db->transCommit();
+            // Return success response
+            return $this->response->setJSON($this->makeOutput([], SUCCESS, USER_DELETED_SUCCESSFULLY));
         } catch (\Exception $e) {
             // Log the exception if an error occurs
             $this->response->setStatusCode(BAD_REQUEST);
