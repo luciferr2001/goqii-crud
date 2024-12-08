@@ -11,6 +11,7 @@ $routes->get('/', 'Home::index');
 $routes->group("v1", function ($routes) {
     // Protected Routes
     $routes->group("user", ['filter' => 'auth'], function ($routes) {
+        $routes->get("", [User::class, 'listing_user']);
         $routes->get("form", [User::class, 'master_form_user']);
         $routes->get("(:any)", [User::class, 'detail_user/$1']);
         $routes->post("", [User::class, 'add_user']);

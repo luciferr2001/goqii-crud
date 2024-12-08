@@ -73,6 +73,39 @@ class User extends Home
     }
 
     /**
+     * This function is used listing of the users.
+     *
+     * @return Response Array of data is returned in the response.
+     */
+    public function listing_user(): Response
+    {
+        /* Not implementing pagination as of now but pagination is a required thing to make the load on server and database less
+        
+        Example of pagination i used in other projects
+
+        page=0&size=10&sort_by=phone_number&sort_order=asc&filter_value=
+
+        Below is a sample code which i used for sorting and size
+
+        $sort_order = empty($query_params['sort_order']) ? $default_sort_order : $query_params['sort_order'];
+        $size = $query_params['size'] ?? $default_page_size;
+        $page = $query_params['page'] ?? $default_page_number;
+        $builder->orderBy($sort_by, $sort_order);
+        $next_offset = $page * $size;
+        $builder->limit($size, $next_offset);
+
+        */
+        try {
+            /* As i am not updating added_by and updated_by so not showing it */
+            $users = $this->common_model->getData(MAIN_USER, array('is_deleted' => NOT_DELETED), 'id,first_name,last_name,email,phone_number,dob,added_on,updated_on,status');
+            return $this->response->setJSON($this->makeOutput($users, SUCCESS, DATA_FETCHED_SUCCESSFULLY));
+        } catch (\Exception $e) {
+            // Set log here for error logging if required
+            return $this->response->setJSON($this->makeOutput(array(), FAIL_ERR_CODE, $e->getMessage()));
+        }
+    }
+
+    /**
      * This function is used to add user.
      *
      * @return Response Success or Failure is returned in the response.
@@ -149,8 +182,9 @@ class User extends Home
     }
 
     /**
-     * This function is used to edit user.
+     * This function is used to edit a user.
      *
+     * @param int $user_id The ID of the user to be edited.
      * @return Response Success or Failure is returned in the response.
      */
     public function edit_user($user_id): Response
@@ -220,6 +254,7 @@ class User extends Home
     /**
      * This function is used delete user.
      *
+     * @param int $user_id The ID of the user to be deleted.
      * @return Response Success or Failure is returned in the response.
      */
     public function delete_user($user_id): Response
