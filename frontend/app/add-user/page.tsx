@@ -1,59 +1,73 @@
 "use client";
 
 import DynamicForm from "@/components/form";
+import { StandardResponse } from "@/interface/standard-response";
+import { getRequest, postRequest } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { FieldValues } from "react-hook-form";
 
+import toast, { Toaster, ToastType } from "react-hot-toast";
+
 export default function Home() {
-  const handleSubmit = (data: FieldValues) => {
-    console.log(data);
+  const router = useRouter();
+  const notify = (message: string, type: ToastType) => {
+    if (type === "success") {
+      toast.success(message);
+    } else if (type === "error") {
+      toast.error(message);
+    } else {
+      toast(message); // Fallback to the default toast type
+    }
   };
 
-  const formSchema = {
-    first_name: {
-      label: "First Name",
-      rules: [
-        "required",
-        "max_length[50]",
-        "regex_match[^[^\\s][\\w',.\\-\\s][^0-9_!¡?÷?¿\\/\\+=@#$%&*(){}|~<>;:[\\]]{0,}[^\\s]$]",
-      ],
-      type: "input",
-    },
-    last_name: {
-      label: "Last Name",
-      rules: [
-        "required",
-        "max_length[50]",
-        "regex_match[^[^\\s][\\w',.\\-\\s][^0-9_!¡?÷?¿\\/\\+=@#$%&*(){}|~<>;:[\\]]{0,}[^\\s]$]",
-      ],
-      type: "input",
-    },
-    email: {
-      label: "Email",
-      rules: [
-        "required",
-        "regex_match[^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$]",
-      ],
-      type: "input",
-    },
-    phone_number: {
-      label: "Phone Number",
-      rules: [
-        "required",
-        "max_length[10]",
-        "min_length[10]",
-        "regex_match[^[0-9]+$]",
-      ],
-      type: "input",
-    },
-    dob: {
-      label: "Date Of Birth",
-      rules: ["required"],
-      type: "date",
-    },
+  const handleSubmit = async (data: FieldValues) => {
+    setIsSubmitEnabled(false)
+    notify("Working", "loading");
+    // Create a promise that wraps the async operation
+    const promise = postRequest(ADD_USER_URL, data);
+    try {
+      const result: StandardResponse = await promise;
+      if (result.code !== 1) {
+        notify(result.message, "error");
+        setIsSubmitEnabled(true)
+      } else {
+        notify(result.message, "success");
+        router.back();
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
+  const [formLoading, setFormLoading] = useState<boolean>(true);
+  const [formSchema, setformSchema] = useState({});
+
+  const [isSubmitEnabled, setIsSubmitEnabled] = useState(true);
+
+  const FORM_URL = "http://localhost:8080/v1/user/form";
+  const ADD_USER_URL = "http://localhost:8080/v1/user";
+
+  useEffect(() => {
+    setFormLoading(true);
+    const fetchData = async () => {
+      const data: StandardResponse = await getRequest(FORM_URL);
+      setformSchema(data.data);
+      setFormLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  if (formLoading) {
+    return (
+      <div className="flex justify-center items-center w-full h-64">
+        <div className="border-t-4 border-gray-500 border-solid rounded-full w-8 h-8 animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-8">
-      <DynamicForm schema={formSchema} onSubmit={handleSubmit} />
+      <DynamicForm schema={formSchema} onSubmit={handleSubmit} is_enabled={isSubmitEnabled} />
     </div>
   );
 }

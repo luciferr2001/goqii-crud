@@ -16,29 +16,23 @@ interface User {
 
 const USERS_URL = "http://localhost:8080/v1/user";
 
-async function users() {
-  try {
-    const data: StandardResponse = await getRequest(USERS_URL);
-    return data.data;
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
-}
+type DynamicFormProps = {
+  refresh: number;
+};
 
-export default function UserTable() {
+export const UserTable: React.FC<DynamicFormProps> = ({ refresh }) => {
   const [userData, setUserData] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
+  
   useEffect(() => {
+    setLoading(true);
     const fetchData = async () => {
-      const fetchedUsers = await users();
-      setUserData(fetchedUsers);
+      const data: StandardResponse = await getRequest(USERS_URL);
+      setUserData(data.data);
       setLoading(false);
     };
-
     fetchData();
-  }, []);
+  }, [refresh]);
 
   if (loading) {
     return (
@@ -92,4 +86,4 @@ export default function UserTable() {
       </div>
     </div>
   );
-}
+};

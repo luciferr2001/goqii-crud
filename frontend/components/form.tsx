@@ -19,14 +19,16 @@ type Schema = {
 type DynamicFormProps = {
   schema: Schema;
   onSubmit: (data: FieldValues) => void;
+  is_enabled:boolean
 };
 
-const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit }) => {
+const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit,is_enabled }) => {
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<FieldValues>({
+    mode: "onChange",
     defaultValues: Object.keys(schema).reduce((acc, key) => {
       acc[key] = "";
       return acc;
@@ -69,7 +71,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit }) => {
     switch (field.type) {
       case "input":
         return (
-          <div className="flex flex-col" key={name}>
+          <div className="flex flex-col w-full" key={name}>
             <label>{field.label}</label>
             <Controller
               name={name}
@@ -88,7 +90,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit }) => {
         );
       case "date":
         return (
-          <div className="flex flex-col" key={name}>
+          <div className="flex flex-col w-full" key={name}>
             <label>{field.label}</label>
             <Controller
               name={name}
@@ -130,7 +132,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema, onSubmit }) => {
         )}
       </div>
       <div>
-        <Button type="submit">Submit</Button>
+        <Button disabled={!is_enabled} type="submit">Submit</Button>
       </div>
     </form>
   );
