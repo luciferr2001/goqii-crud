@@ -5,6 +5,7 @@ import { useForm, Controller, FieldValues } from "react-hook-form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { DatePicker } from "./ui/datepicker";
+import { filterChangedFormFields } from "@/lib/utils";
 
 type Field = {
   label: string;
@@ -21,6 +22,7 @@ type DynamicFormProps = {
   onSubmit: (data: FieldValues) => void;
   is_enabled: boolean;
   values?: any;
+  formType: "add" | "edit";
 };
 
 const DynamicForm: React.FC<DynamicFormProps> = ({
@@ -28,12 +30,13 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   onSubmit,
   is_enabled,
   values,
+  formType,
 }) => {
   const {
     setValue,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<FieldValues>({
     mode: "onChange",
     defaultValues: Object.keys(schema).reduce((acc, key) => {
@@ -49,6 +52,17 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
       });
     }
   }, [values, setValue]);
+
+  const handleFormSubmit = (data: FieldValues) => {
+    if (formType === "edit") {
+      // Filter only the changed fields for "edit"
+      const changedValues = filterChangedFormFields(data, dirtyFields);
+      onSubmit(changedValues);
+    } else {
+      // Send all values for "add"
+      onSubmit(data);
+    }
+  };
 
   const renderField = (name: string, field: Field) => {
     const validationRules: Record<string, any> = {};
@@ -140,7 +154,10 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   };
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+    <form
+      className="flex flex-col gap-4"
+      onSubmit={handleSubmit(handleFormSubmit)}
+    >
       <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
         {Object.entries(schema).map(([name, field]) =>
           renderField(name, field)

@@ -2,35 +2,26 @@
 
 import DynamicForm from "@/components/form";
 import { StandardResponse } from "@/interface/standard-response";
-import { getRequest, postRequest } from "@/lib/utils";
+import { getRequest, notify, postRequest } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FieldValues } from "react-hook-form";
+import toast from "react-hot-toast";
 
-import toast, { Toaster, ToastType } from "react-hot-toast";
 
 export default function Home() {
   const router = useRouter();
-  const notify = (message: string, type: ToastType) => {
-    if (type === "success") {
-      toast.success(message);
-    } else if (type === "error") {
-      toast.error(message);
-    } else {
-      toast(message); // Fallback to the default toast type
-    }
-  };
-
   const handleSubmit = async (data: FieldValues) => {
-    setIsSubmitEnabled(false)
+    setIsSubmitEnabled(false);
     notify("Working", "loading");
     // Create a promise that wraps the async operation
     const promise = postRequest(ADD_USER_URL, data);
     try {
       const result: StandardResponse = await promise;
+      toast.dismiss();
       if (result.code !== 1) {
         notify(result.message, "error");
-        setIsSubmitEnabled(true)
+        setIsSubmitEnabled(true);
       } else {
         notify(result.message, "success");
         router.back();
@@ -68,7 +59,12 @@ export default function Home() {
   return (
     <div className="p-8 flex flex-col space-y-4">
       <h1 className="text-xl">Add User Form</h1>
-      <DynamicForm schema={formSchema} onSubmit={handleSubmit} is_enabled={isSubmitEnabled} />
+      <DynamicForm
+        schema={formSchema}
+        onSubmit={handleSubmit}
+        is_enabled={isSubmitEnabled}
+        formType="add"
+      />
     </div>
   );
 }

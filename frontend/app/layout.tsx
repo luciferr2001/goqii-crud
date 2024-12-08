@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import { BackButton } from "@/components/back";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,7 +31,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Toaster />
-        {children}
+        <div className="p-8 flex flex-col space-y-4">
+          <div>
+            <BackButton />
+          </div>
+          {children}
+        </div>
       </body>
     </html>
   );

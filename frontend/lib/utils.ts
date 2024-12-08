@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import toast, {ToastType } from "react-hot-toast";
 
 const FAKE_TOKEN = "sdfijsoidfjio3jr2o4u294294323rj2foijewjf";
 
@@ -65,4 +66,31 @@ export const deleteRequest = (url: string) => {
       console.error("Error in deleteRequest:", error);
       return Promise.resolve(); // Return an empty resolved promise
     });
+};
+
+
+import { FieldValues } from 'react-hook-form';
+
+export const filterChangedFormFields = <T extends FieldValues>(
+    allFields: T,
+    dirtyFields: Partial<Record<keyof T, boolean>>
+): Partial<T> => {
+    const changedFieldValues = Object.keys(dirtyFields).reduce((acc, currentField) => {
+        return {
+            ...acc,
+            [currentField]: allFields[currentField]
+        }
+    }, {} as Partial<T>);
+
+    return changedFieldValues;
+};
+
+export const notify = (message: string, type: ToastType) => {
+  if (type === "success") {
+    toast.success(message);
+  } else if (type === "error") {
+    toast.error(message);
+  } else {
+    toast(message); // Fallback to the default toast type
+  }
 };

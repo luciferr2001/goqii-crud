@@ -1,8 +1,12 @@
 import { StandardResponse } from "@/interface/standard-response";
-import { getRequest } from "@/lib/utils";
+import { deleteRequest, getRequest, notify } from "@/lib/utils";
+import { Dialog } from "@radix-ui/react-dialog";
 import { Edit, Trash } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { SureDialog } from "./sure-dialog";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface User {
   id: string;
@@ -18,14 +22,14 @@ interface User {
 
 const USERS_URL = "http://localhost:8080/v1/user";
 
-type DynamicFormProps = {
-  refresh: number;
-};
-
-export const UserTable: React.FC<DynamicFormProps> = ({ refresh }) => {
+export const UserTable: React.FC = () => {
   const [userData, setUserData] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+  const [refreshKey, setRefreshKey] = useState<number>(0);
+
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
@@ -34,7 +38,34 @@ export const UserTable: React.FC<DynamicFormProps> = ({ refresh }) => {
       setLoading(false);
     };
     fetchData();
-  }, [refresh]);
+  }, [refreshKey]);
+
+  const handleDeleteClick = (user: User) => {
+    setSelectedUser(user);
+    setDialogOpen(true);
+  };
+
+  const USER_URL = "http://localhost:8080/v1/user";
+
+  const handleDelete = async () => {
+    if (selectedUser) {
+      notify("Working", "loading");
+      // Create a promise that wraps the async operation
+      const promise = deleteRequest(`${USER_URL}/${selectedUser?.id}`);
+      try {
+        const result: StandardResponse = await promise;
+        toast.dismiss();
+        if (result.code !== 1) {
+          notify(result.message, "error");
+        } else {
+          notify(result.message, "success");
+          setRefreshKey((prevKey) => prevKey + 1);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -84,9 +115,15 @@ export const UserTable: React.FC<DynamicFormProps> = ({ refresh }) => {
                 </td>
                 <td className="px-4 py-3 flex space-x-2">
                   <Link href={`edit-user/${encodeURIComponent(user.id)}`}>
-                    <Edit className="text-blue-600 hover:text-blue-800" size={16} />
+                    <Edit
+                      className="text-blue-600 hover:text-blue-800"
+                      size={16}
+                    />
                   </Link>
-                  <button className="text-red-600 hover:text-red-800">
+                  <button
+                    onClick={() => handleDeleteClick(user)}
+                    className="text-red-600 hover:text-red-800"
+                  >
                     <Trash size={16} />
                   </button>
                 </td>
@@ -95,6 +132,13 @@ export const UserTable: React.FC<DynamicFormProps> = ({ refresh }) => {
           </tbody>
         </table>
       </div>
+      <SureDialog
+        onConfirm={handleDelete}
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        title="Are you sure?"
+        content={`This will permanently delete the user ${selectedUser?.first_name} ${selectedUser?.last_name}.`}
+      ></SureDialog>
     </div>
   );
 };

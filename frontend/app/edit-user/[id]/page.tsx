@@ -2,13 +2,35 @@
 
 import DynamicForm from "@/components/form";
 import { StandardResponse } from "@/interface/standard-response";
-import { getRequest } from "@/lib/utils";
+import { getRequest, notify, patchRequest } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { FieldValues } from "react-hook-form";
+import toast from "react-hot-toast";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
+  const router = useRouter();
+  const USER_URL = "http://localhost:8080/v1/user";
   const handleSubmit = async (data: FieldValues) => {
-    console.log(data);
+    if(data){
+      setIsSubmitEnabled(false);
+      notify("Working", "loading");
+      // Create a promise that wraps the async operation
+      const promise = patchRequest(`${USER_URL}/${unwrappedParams.id}`, data);
+      try {
+        const result: StandardResponse = await promise;
+        toast.dismiss();
+        if (result.code !== 1) {
+          notify(result.message, "error");
+          setIsSubmitEnabled(true);
+        } else {
+          notify(result.message, "success");
+          router.back();
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
   };
   const [formLoading, setFormLoading] = useState<boolean>(true);
   const [formSchema, setformSchema] = useState({});
@@ -27,7 +49,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       const data: StandardResponse = await getRequest(
         `${USER_DETAIL_URL}/${unwrappedParams.id}`
       );
-      setValues(data.data)
+      setValues(data.data);
       setFormLoading(false);
     };
     fetchData();
@@ -48,6 +70,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         onSubmit={handleSubmit}
         is_enabled={isSubmitEnabled}
         values={values}
+        formType="edit"
       />
     </div>
   );
