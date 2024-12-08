@@ -74,6 +74,7 @@ class CommonModel extends Model
         } else {
             return 0;
         }
+        
     }
 
     public function getLastId($table)

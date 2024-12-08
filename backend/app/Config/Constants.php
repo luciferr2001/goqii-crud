@@ -129,3 +129,5 @@ define('UNAUTHORIZED', '401');
 
 
 define('ACCESS_DENIED', 'Access denied');
+
+define('CONSTANT_PASSWORD', 'Abc@1234');

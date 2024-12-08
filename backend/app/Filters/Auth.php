@@ -30,6 +30,7 @@ class Auth implements FilterInterface
     {
         // As of now just passing a simple token to to duplicate authorization
         $request = \Config\Services::request();
+        $response = service('response');
         $header = $request->getHeaderLine('Authorization');
         $token = null;
         if (!empty($header) && preg_match('/Bearer\s(\S+)/', $header, $matches)) {
@@ -37,10 +38,8 @@ class Auth implements FilterInterface
         }
         // If the tokennis empty return unauthorized
         if (empty($token)) {
-            $response = service('response');
-            $response->setBody(ACCESS_DENIED . ' as token is empty');
             $response->setStatusCode(UNAUTHORIZED);
-            return $response;
+            return $response->setJSON($this->makeOutput(array(), FAIL_ERR_CODE, ACCESS_DENIED . ' as token is empty'));
         }
     }
 

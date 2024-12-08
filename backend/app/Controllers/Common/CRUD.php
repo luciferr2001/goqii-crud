@@ -60,13 +60,16 @@ class CRUD extends BaseController
             $add_data = $this->common_model->setData($table_name, $data, $return_id);
             if (!$add_data) {
                 $db->transRollback();
+                $db->transComplete();
                 throw new \Exception(DATABASE_ERROR);
             }
             if ($return_id) {
                 $db->transCommit();
+                $db->transComplete();
                 return $add_data;
             }
             $db->transCommit();
+            $db->transComplete();
             return true;
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
@@ -99,9 +102,11 @@ class CRUD extends BaseController
             $update_data = $this->common_model->updateData($table_name, array('id' => $id), $data,);
             if (!$update_data) {
                 $db->transRollback();
+                $db->transComplete();
                 throw new \Exception(DATABASE_ERROR);
             }
             $db->transCommit();
+            $db->transComplete();
             return true;
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
@@ -116,9 +121,11 @@ class CRUD extends BaseController
             $delete_data = $this->common_model->updateData($table_name, array('id' => $id), $data);
             if (!$delete_data) {
                 $db->transRollback();
+                $db->transComplete();
                 throw new \Exception(DATABASE_ERROR);
             }
             $db->transCommit();
+            $db->transComplete();
             return true;
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());

@@ -12,19 +12,23 @@ trait CommonTraits
         return json_encode(array('data' => $data, 'code' => (int) $code, 'message' => $message));
     }
 
-    public static function generate_random_password($length = 10)
+    public static function generate_password($random, $length = 10)
     {
-        // Characters to be used in the password
-        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
-        // Get the length of the character list
-        $chars_length = strlen($chars);
-        // Initialize the password variable
-        $password = '';
-        // Generate random characters to form the password
-        for ($i = 0; $i < $length; $i++) {
-            $password .= $chars[rand(0, $chars_length - 1)];
+        if ($random) {
+            // Characters to be used in the password
+            $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+            // Get the length of the character list
+            $chars_length = strlen($chars);
+            // Initialize the password variable
+            $password = '';
+            // Generate random characters to form the password
+            for ($i = 0; $i < $length; $i++) {
+                $password .= $chars[rand(0, $chars_length - 1)];
+            }
+            return $password;
+        } else {
+            return CONSTANT_PASSWORD;
         }
-        return $password;
     }
 
     public function generate_uuidv4()
@@ -43,7 +47,7 @@ trait CommonTraits
             // Output the 36 character UUID.
             $uuid = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
             // Check if UUID already exists in the system
-            if (!$this->uuidExists($uuid)) {
+            if (!$this->uuid_exists($uuid)) {
                 // Unique UUID generated, return
                 return $uuid;
             }
