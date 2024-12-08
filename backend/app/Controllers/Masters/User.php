@@ -132,6 +132,7 @@ class User extends Home
             // md5 the password
             $data['password'] = md5($password);
             $data['dob'] = date('Y-m-d', strtotime($data['dob']));
+            $data = array_intersect_key($data, $form_rules);
             // Add the user data to the database using the CRUD method
             $user_id = $this->crud->add(MAIN_USER, $data, $form_rules, true);
             /* With Returned user id we can map any role to the user */
@@ -163,6 +164,10 @@ class User extends Home
                 return $this->response->setJSON($this->makeOutput(array(), FAIL_ERR_CODE, DATA_REQUIRED));
             }
             $user_data = $this->data_request;
+            $check_if_user_is_deleted = $this->common_model->checkRecordExists(array('id' => $user_id, 'is_deleted' => DELETED), MAIN_USER);
+            if ($check_if_user_is_deleted) {
+                return $this->response->setJSON($this->makeOutput(array(), FAIL_ERR_CODE, USER_DELETED));
+            }
             // Start a database transaction
             $db = db_connect();
             $db->transBegin();
@@ -189,12 +194,16 @@ class User extends Home
             }
             $form_rules = $this->form_fields;
             $form_rules = array_intersect_key($this->form_fields, $data);
+            if (empty($form_rules)) {
+                return $this->response->setJSON($this->makeOutput(array(), FAIL_ERR_CODE, DATA_REQUIRED));
+            }
             $form_rules['updated_on'] = [
                 'label' => 'Updated On',
                 "rules" => ['required'],
             ];
             $data['updated_on'] = $this->current_date_time;
             /* As of now not updating the updated_by as login auth is not created */
+            $data = array_intersect_key($data, $form_rules);
             // Update the user data to the database using the CRUD method
             $this->crud->update(MAIN_USER, $user_id, $data, $form_rules);
             // Commit the transaction if everything is successful
@@ -222,7 +231,7 @@ class User extends Home
             /* Creating a soft delete functionalty to ensure that no data is deleted */
             $check_if_user_is_deleted = $this->common_model->checkRecordExists(array('id' => $user_id, 'is_deleted' => DELETED), MAIN_USER);
             if ($check_if_user_is_deleted) {
-                return $this->response->setJSON($this->makeOutput(array(), FAIL_ERR_CODE, USER_ALREADY_DELETED));
+                return $this->response->setJSON($this->makeOutput(array(), FAIL_ERR_CODE, USER_DELETED));
             }
             // Start a database transaction
             $db = db_connect();

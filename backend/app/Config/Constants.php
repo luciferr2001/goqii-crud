@@ -116,7 +116,7 @@ define('USER_INACTIVE_OR_DELETED', 'User is inactive or deleted');
 define('USER_CREATED_SUCCESSFULLY', 'User created successfully.');
 define('USER_UPDATED_SUCCESSFULLY', 'User Updated Successfully');
 define('USER_DELETED_SUCCESSFULLY', 'User Deleted Successfully');
-define('USER_ALREADY_DELETED', 'User Already Deleted');
+define('USER_DELETED', 'User is marked as deleted');
 define('FIRST_LAST_NAME_REQUIRED', 'First & Last Name is required');
 
 define('EMAIL_IS_REQUIRED', 'Email is required');
