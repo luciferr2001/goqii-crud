@@ -1,5 +1,5 @@
 import { StandardResponse } from "@/interface/standard-response";
-import { deleteRequest, getRequest, notify } from "@/lib/utils";
+import { deleteRequest, getRequest, HARCODED_URL, notify } from "@/lib/utils";
 import { Dialog } from "@radix-ui/react-dialog";
 import { Edit, Trash } from "lucide-react";
 import Link from "next/link";
@@ -20,7 +20,7 @@ interface User {
   status: string; // Or `number` based on your use case
 }
 
-const USERS_URL = "http://localhost:8080/v1/user";
+const USER_URL = `${HARCODED_URL}/user`;
 
 export const UserTable: React.FC = () => {
   const [userData, setUserData] = useState<User[]>([]);
@@ -33,7 +33,7 @@ export const UserTable: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
-      const data: StandardResponse = await getRequest(USERS_URL);
+      const data: StandardResponse = await getRequest(USER_URL);
       setUserData(data.data);
       setLoading(false);
     };

@@ -2,7 +2,7 @@
 
 import DynamicForm from "@/components/form";
 import { StandardResponse } from "@/interface/standard-response";
-import { getRequest, notify, patchRequest } from "@/lib/utils";
+import { getRequest, HARCODED_URL, notify, patchRequest } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { FieldValues } from "react-hook-form";
@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const USER_URL = "http://localhost:8080/v1/user";
+  const USER_URL = `${HARCODED_URL}/user`;
   const handleSubmit = async (data: FieldValues) => {
     if(data){
       setIsSubmitEnabled(false);

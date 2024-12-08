@@ -2,7 +2,7 @@
 
 import DynamicForm from "@/components/form";
 import { StandardResponse } from "@/interface/standard-response";
-import { getRequest, notify, postRequest } from "@/lib/utils";
+import { getRequest, HARCODED_URL, notify, postRequest } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FieldValues } from "react-hook-form";
@@ -35,8 +35,8 @@ export default function Home() {
 
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(true);
 
-  const FORM_URL = "http://localhost:8080/v1/user/form";
-  const ADD_USER_URL = "http://localhost:8080/v1/user";
+  const FORM_URL =`${HARCODED_URL}/user/form`;
+  const ADD_USER_URL = `${HARCODED_URL}/user`;
 
   useEffect(() => {
     setFormLoading(true);

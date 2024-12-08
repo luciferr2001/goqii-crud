@@ -94,3 +94,5 @@ export const notify = (message: string, type: ToastType) => {
     toast(message); // Fallback to the default toast type
   }
 };
+
+export const HARCODED_URL="http://localhost:8080/v1"
